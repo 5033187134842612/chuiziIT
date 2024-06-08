@@ -1,3 +1,17 @@
-# 项目介绍
+# 环境介绍和部署
 
-介绍F5 ACC Chariot工具，该工具可以转换ucs/qkview配置，应用层至AS3，网络系统层至DO。
+• Bigip VE：14.1.4.4
+
+• AS3版本：3.33.0
+
+• VSCode版本：1.67.2
+
+
+ **1. 安装环境** 
+
+1）VSCode下载并安装
+https://code.visualstudio.com/
+
+2）安装F5插件
+
+
