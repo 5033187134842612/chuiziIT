@@ -16,6 +16,9 @@ https://code.visualstudio.com/
 
 ![输入图片说明](pictures/1.png)
 
+3)F5安装AS3和DO
+![输入图片说明](pictures/101.png)
+
  **2.F5 ACC Chariot 转换实验** 
 
 1）连接F5
@@ -52,3 +55,9 @@ error报错：需修改schemaVersion
 应用下发成功！
 
 ![输入图片说明](pictures/9.png)
+
+ **3.DO配置实验** 
+![输入图片说明](pictures/10.png)
+
+200 ok 推送成功！
+![输入图片说明](pictures/12.png)
