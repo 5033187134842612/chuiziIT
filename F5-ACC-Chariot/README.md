@@ -61,3 +61,6 @@ error报错：需修改schemaVersion
 
 200 ok 推送成功！
 ![输入图片说明](pictures/12.png)
+
+查看VE上的配置
+![输入图片说明](pictures/13.png)
