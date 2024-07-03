@@ -7,7 +7,7 @@
 • VSCode版本：1.67.2
 
 
- **1. 安装环境** 
+# 1. 安装环境
 
 1）VSCode下载并安装
 https://code.visualstudio.com/
@@ -19,7 +19,7 @@ https://code.visualstudio.com/
 3)F5安装AS3和DO
 ![输入图片说明](pictures/101.png)
 
- **2.F5 ACC Chariot 转换实验** 
+# 2.F5 ACC Chariot 转换实验
 
 1）连接F5
 ![输入图片说明](pictures/2.png)
@@ -56,7 +56,7 @@ error报错：需修改schemaVersion
 
 ![输入图片说明](pictures/9.png)
 
- **3.DO配置实验** 
+# 3.DO配置实验 
 ![输入图片说明](pictures/10.png)
 
 200 ok 推送成功！
