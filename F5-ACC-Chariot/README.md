@@ -57,6 +57,10 @@ error报错：需修改schemaVersion
 ![输入图片说明](pictures/9.png)
 
 # 3.DO配置实验 
+
+下载链接 https://github.com/F5Networks/f5-declarative-onboarding/releases
+
+推送DO配置
 ![输入图片说明](pictures/10.png)
 
 200 ok 推送成功！
