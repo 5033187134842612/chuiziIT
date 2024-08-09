@@ -1,0 +1,334 @@
+# f5-appsvcs-3.36.0-6
+
+#### 介绍
+1.1 The F5 ExtensionF5中安装AS3扩展，在vscode中通过插件，可以连接到F5，实现AS3语法提示及 F5 Extension
+纠错快速构建AS3模板，直接在vscode中推送AS3ison至F5实现简单L4业务下发
+
+1.2 通过插件导出ucs
+
+1.3 导入ucs,qkview
+
+
+#### 安装步骤介绍
+
+1.  在F5中安装AS3拓展
+2.  安装vscode并添加F5插件
+3.  通过vscode下发代码实现业务下发，导出ucs等功能
+4.  通过vscode下发代码实现四层负载服务发布演示，包含自定义源地址会话保持，自定义TCP健康检查，SNATPOOL的配置展示
+5.  通过vscode下发代码实现通过AS3发布多个业务VS的场景，至少包含3个，包含一个UDP应用
+
+
+
+#### 基础架构
+1.1 版本说明
+| 名称                   | 版本说明   |
+|----------------------|--------|
+| F5                   | 15.1.2 |
+| f5-appsvcs-extension | 3.36.0 |
+| vscode               | 1.67.2 |
+
+1.2 AS3声明实例介绍
+![输入图片说明](image3.png)
+![输入图片说明](image4.png)
+
+#### 在F5中安装AS3拓展
+
+1.  前往askF5，下载最新的f5-appsvcs-extension rpm包。
+![输入图片说明](image.png)
+PS:网站打不开需要科学上网
+2.  在F5上安装rpm包
+BIG-IP GUI:Main tab > iApps > Package Management LX > Import
+![输入图片说明](image2.png)
+
+
+
+#### 安装vscode并添加F5插件
+
+1.  前往[vscode官网](https://code.visualstudio.com/)，下载对应客户端vscode的最新版本，本次以64位windows客户端为例。
+![输入图片说明](image5.png)
+2.  安装vscode，并添加F5插件
+![输入图片说明](image6.png)
+安装完后会出现F5图标
+![输入图片说明](image7.png)
+3.  测试连接F5设备
+在F5插件中添加F5设备，输入web页面的账号、Ip以及密码信息
+![输入图片说明](image8.png)
+可以看到相关设备信息则为连接成功
+![输入图片说明](image9.png)
+PS:一定要先在F5中导入AS3拓展插件，再用vscode进行连接
+
+#### 通过vscode下发代码实现业务下发，导出ucs等功能
+
+1.  通过vscode下发vs
+![输入图片说明](image13.png)
+![输入图片说明](image14.png)
+![输入图片说明](image12.png)
+2.  通过vscode下载ucs 
+
+点击所需要的ucs文件即可下载
+![输入图片说明](image10.png)
+3.  通过vscode上传ucs，qkview
+![输入图片说明](image11.png)
+![输入图片说明](image15.png)
+![输入图片说明](image16.png)
+
+#### 通过vscode下发代码实现四层负载服务发布演示，包含自定义源地址会话保持，自定义TCP健康检查，SNATPOOL的配置展示
+
+1.自定义源地址会话保持
+```
+{
+  "class": "AS3",
+  "action": "deploy",
+  "persist": true,
+  "declaration": {
+    "class": "ADC",
+    "schemaVersion": "3.0.0",
+    "id": "fghijkl7890",
+    "label": "Sample 1",
+    "remark": "HTTP with custom persistence",
+    "Sample_http_01": {
+      "class": "Tenant",
+      "A1": {
+        "class": "Application",
+        "service": {
+          "class": "Service_HTTP",
+          "virtualAddresses": [
+            "10.0.6.10"
+          ],
+          "pool": "web_pool",
+          "persistenceMethods": [{
+            "use": "jsessionid"
+          }]
+        },
+        "web_pool": {
+          "class": "Pool",
+          "monitors": [
+            "http"
+          ],
+          "members": [{
+            "servicePort": 80,
+            "serverAddresses": [
+              "192.0.6.10",
+              "192.0.6.11"
+            ]
+          }]
+        },
+        "jsessionid": {
+          "class": "Persist",
+          "persistenceMethod": "cookie",
+          "cookieMethod": "hash",
+          "cookieName": "JSESSIONID"
+        }
+      }
+    }
+  }
+}
+```
+
+2.自定义TCP健康检查
+```
+{
+    "class": "ADC",
+    "schemaVersion": "3.30.0",
+    "id": "dda23da4-3f9b-49c3-91e8-aa6a3f88baa5",
+    "updateMode": "selective",
+    "TCPTest": {
+        "class": "Tenant",
+        "TCP_Monitor_Test": {
+            "class": "Application",
+            "template": "generic",
+            "service": {
+                "class": "Service_TCP",
+                "virtualAddresses": [
+                    "10.0.9.10"
+                ],
+                "virtualPort": 1234,
+                "pool": "TCP_Pool"
+                },
+                "TCP_Pool": {
+                    "class": "Pool",
+                    "monitors": [
+                        {
+                            "use": "TCP_Monitor"
+                        },
+                        {
+                            "use": "UDP_Monitor"
+                        }
+                    ],
+                    "members": [
+                        {
+                            "enable": true,
+                            "adminState": "enable",
+                            "shareNodes": true,
+                            "serverAddresses": [
+                                "1.1.1.1"
+                            ],
+                            "servicePort": 1234
+                        }
+                    ],
+                    "loadBalancingMode": "least-connections-member"
+                },
+            "TCP_Monitor": {
+                "class": "Monitor",
+                "monitorType": "tcp"
+            },
+            "UDP_Monitor": {
+                "class": "Monitor",
+                "monitorType": "udp"
+            }
+        }
+    }
+}
+```
+
+3.自定义SNATPOOL的配置
+```
+{
+    "class": "ADC",
+    "schemaVersion": "3.16.0",
+    "label": "snat_pool_existing",
+    "remark": "reference_snat_pool",
+    "Sample_SNAT_Pool": {
+        "class": "Tenant",
+        "SNAT_app": {
+            "class": "Application",
+            "SNAT_service": {
+                "class": "Service_TCP",
+                "virtualPort": 8181,
+                "virtualAddresses": [
+                    "192.0.2.100"
+                ],
+                "pool": "web_pool",
+                "snat": {
+                    "use": "CreateSnatPool"
+                }
+            },
+            "web_pool": {
+               "class": "Pool",
+               "monitors": [
+                  "http"
+               ],
+               "members": [{
+                  "servicePort": 80,
+                  "serverAddresses": [
+                     "192.0.6.10",
+                     "192.0.6.11"
+                  ]
+               }]
+            },
+            "CreateSnatPool": {
+                "class": "SNAT_Pool",
+                "snatAddresses": [
+                    "192.0.96.10",
+                    "192.0.96.11"
+                 ]
+            }
+        }
+    }
+}
+```
+
+#### 通过vscode下发代码实现通过AS3发布多个业务VS的场景，至少包含3个，包含一个UDP应用
+
+
+```
+{
+    "id": "ea67e96a-480e-48d4-9531-996dad42f1d5",
+    "results": [
+        {
+            "code": 200,
+            "message": "success",
+            "lineCount": 18,
+            "host": "localhost",
+            "tenant": "Sample_http_07",
+            "runTime": 2365
+        }
+    ],
+    "declaration": {
+        "Sample_http_07": {
+            "class": "Tenant",
+            "A1": {
+                "class": "Application",
+                "service": {
+                    "class": "Service_HTTP",
+                    "remark": "Defaults to port 80",
+                    "virtualAddresses": [
+                        "10.1.10.10"
+                    ],
+                    "pool": "web_pool80"
+                },
+                "web_pool80": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 80,
+                            "serverAddresses": [
+                                "10.128.0.209"
+                            ]
+                        }
+                    ]
+                },
+                "service_on_port81": {
+                    "class": "Service_UDP",
+                    "remark": "Accepts HTTP connections on port 81",
+                    "virtualPort": 81,
+                    "virtualAddresses": [
+                        "10.1.10.10"
+                    ],
+                    "pool": "web_pool81"
+                },
+                "web_pool81": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 81,
+                            "serverAddresses": [
+                                "10.128.0.210"
+                            ]
+                        }
+                    ]
+                },
+                "service_on_port82": {
+                    "class": "Service_HTTP",
+                    "remark": "Accepts HTTP connections on port 82",
+                    "virtualAddresses": [
+                        "10.1.10.10"
+                    ],
+                    "virtualPort": 82,
+                    "pool": "web_pool82"
+                },
+                "web_pool82": {
+                    "class": "Pool",
+                    "monitors": [
+                        "http"
+                    ],
+                    "members": [
+                        {
+                            "servicePort": 82,
+                            "serverAddresses": [
+                                "10.128.0.211"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "class": "ADC",
+        "schemaVersion": "3.2.0",
+        "id": "8675309",
+        "controls": {
+            "class": "Controls",
+            "userAgent": "vscode-f5/3.7.1",
+            "archiveTimestamp": "2022-06-22T14:05:51.436Z"
+        },
+        "updateMode": "selective"
+    }
+}
+```
+
